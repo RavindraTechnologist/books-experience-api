@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+		<flow name="batch-processingFlow"
+		doc:id="d83f5fb7-befb-49a6-8a17-25cbd15fffb6">
+		<scheduler doc:name="Scheduler" doc:id="45e6d7f2-9e0b-4396-9128-67ec21ba4a7b" >
+			<scheduling-strategy >
+				<cron expression="1 1 1 1,7 * ?" timeZone="Asia/Kolkata" />
+			</scheduling-strategy>
+		</scheduler>
+		<file:read doc:name="Read" doc:id="62b6b334-b51e-4163-bcd0-52cb267f3a91" config-ref="File_Config" path="C:\Users\ravyadav0\Desktop\demo\input\10000 Records.csv">
+			<reconnect />
+		</file:read>
+		<logger level="INFO" doc:name="Logger"
+			doc:id="5eff3c56-ffac-4589-989f-0a812166cbe1" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="21e8cf1d-1757-4c1f-9a95-c9cbbf862e56">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/csv headerLineNumber = 0 , header = true
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	"﻿Emp ID": payload01.id,
+	"First Name": payload01.name
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger"
+			doc:id="9d9df1d2-3170-45aa-9bca-80235e4119db" />
+		<batch:job jobName="batch-processing-projectBatch_Job"
+			doc:id="cbb53c4d-1139-420e-a25d-ea88afc933fc">
+			<batch:process-records>
+				<batch:step name="Batch_Step"
+					doc:id="ebcc1190-f665-4819-9e84-79ff9cc27a99">
+					<file:write doc:name="Write"
+						doc:id="89176542-19ee-488e-8f7d-69dbb33c2dac"
+						config-ref="File_Config"
+						path="C:\Users\ravyadav0\Desktop\demo\output\abc.json"
+						mode="APPEND" />
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="0e99705f-7cb4-4945-9ec8-67a1fbe877b3" />
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+	</mule>

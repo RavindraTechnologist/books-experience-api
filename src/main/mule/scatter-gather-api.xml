@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="scatter-gather-apiFlow" doc:id="8317194b-e4cd-4706-b7d3-d4c74e60708a" >
+		<http:listener doc:name="Listener" doc:id="c8ab705b-6803-4175-8d85-0c399f61778a" config-ref="HTTP_Listener_config" path="/api/scatter-gather"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="b9345a18-b791-41d8-ba69-1591cc5b5efc" >
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="e7abe9ad-2d4b-4688-8e9b-a503bc42995e" name="scatter-gather-apiSub_Flow"/>
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="6ab49aa7-da87-4fdc-ae86-71bc646e34af" name="scatter-gather-apiSub_Flow1"/>
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="bab172c7-6761-48a2-9e0d-553cfa047e40" name="scatter-gather-apiSub_Flow2"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="59b85b9a-f637-4f33-b303-26a9b292f4d8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+Output:payload..payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="scatter-gather-apiSub_Flow" doc:id="9c7dd381-2af6-498c-8a42-b7db70cfcad2" >
+		<ee:transform doc:name="Transform Message" doc:id="2df5d941-d60e-4f8e-bd34-dc03af10dee4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"id": "id1"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="scatter-gather-apiSub_Flow1" doc:id="f99c9cd4-2b6b-4756-822e-10e28bc4c43f" >
+		<set-variable value="100" doc:name="Set Variable" doc:id="858576e1-8a13-478d-8b94-f0a36b3f6601" variableName="var1"/>
+		<ee:transform doc:name="Transform Message" doc:id="62481a8c-afd9-4aa4-bd19-b1dae501e0da" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+%dw 2.0
+output application/json
+---
+{
+	"id": "id2"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="scatter-gather-apiSub_Flow2" doc:id="4655975c-139f-4c20-a8d8-adb21a15a83b" >
+		<ee:transform doc:name="Transform Message" doc:id="2af48391-ac82-4aa2-a088-b902adb35118" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"id": "id3"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
